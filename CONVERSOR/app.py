@@ -153,6 +153,21 @@ class UnitConverterApp:
         )
         self.combo_from.grid(row=1, column=0, sticky="ew", padx=(0, 5))
 
+        # Swap Button (center column)
+        self.btn_swap = tk.Button(
+            selectors_frame,
+            text="⇄",
+            font=(self.font_family, 14, "bold"),
+            bg=self.card_color,
+            fg=self.primary_color,
+            activebackground=self.card_color,
+            activeforeground=self.primary_hover,
+            relief="flat",
+            cursor="hand2",
+            command=self.swap_units,
+        )
+        self.btn_swap.grid(row=1, column=1, padx=2)
+
         # To Unit
         lbl_to = tk.Label(
             selectors_frame,
@@ -161,7 +176,7 @@ class UnitConverterApp:
             bg=self.card_color,
             fg=self.muted_color,
         )
-        lbl_to.grid(row=0, column=1, sticky="w", pady=(0, 3))
+        lbl_to.grid(row=0, column=2, sticky="w", pady=(0, 3))
 
         self.to_unit_var = tk.StringVar(value="Centimeters (cm)")
         self.combo_to = ttk.Combobox(
@@ -171,10 +186,11 @@ class UnitConverterApp:
             state="readonly",
             font=(self.font_family, 10),
         )
-        self.combo_to.grid(row=1, column=1, sticky="ew", padx=(5, 0))
+        self.combo_to.grid(row=1, column=2, sticky="ew", padx=(5, 0))
 
         selectors_frame.columnconfigure(0, weight=1)
-        selectors_frame.columnconfigure(1, weight=1)
+        selectors_frame.columnconfigure(1, weight=0)
+        selectors_frame.columnconfigure(2, weight=1)
 
         # Buttons Frame (Convert & Clear)
         btn_frame = tk.Frame(inner_frame, bg=self.card_color)
@@ -233,6 +249,13 @@ class UnitConverterApp:
             fg=self.primary_color,
         )
         self.lbl_result_value.pack(anchor="w", pady=(2, 0))
+
+    def swap_units(self):
+        """Intercambia las unidades 'From' y 'To' entre sí."""
+        from_val = self.from_unit_var.get()
+        to_val = self.to_unit_var.get()
+        self.from_unit_var.set(to_val)
+        self.to_unit_var.set(from_val)
 
     def perform_conversion(self):
         raw_input = self.entry_value.get().strip()

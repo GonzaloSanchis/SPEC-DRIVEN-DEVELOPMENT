@@ -45,18 +45,18 @@ class UnitConverterApp:
         self.root = root
         self.root.title("Modern Unit Converter")
         self.root.geometry("450x520")
-        self.root.config(bg="#1a1a2e")
+        self.root.config(bg="#f0f4f8")
         self.root.resizable(False, False)
 
-        # Styling variables (Dark Theme)
+        # Styling variables (Light Theme)
         self.font_family = "Segoe UI"
-        self.bg_color = "#1a1a2e"
-        self.card_color = "#16213e"
+        self.bg_color = "#f0f4f8"
+        self.card_color = "#ffffff"
         self.primary_color = "#4f8ef7"  # Light Blue
         self.primary_hover = "#3b6fd4"  # Darker Blue
-        self.text_color = "#ffffff"
-        self.muted_color = "#a0aec0"
-        self.error_color = "#fc8181"
+        self.text_color = "#1a202c"
+        self.muted_color = "#718096"
+        self.error_color = "#e53e3e"
 
         self.create_widgets()
 
@@ -121,9 +121,9 @@ class UnitConverterApp:
             bd=1,
             relief="solid",
             highlightcolor=self.primary_color,
-            bg="#0f3460",
-            fg="#ffffff",
-            insertbackground="#ffffff",
+            bg="#ffffff",
+            fg="#1a202c",
+            insertbackground="#1a202c",
             validate="key",
             validatecommand=vcmd,
         )
@@ -216,10 +216,10 @@ class UnitConverterApp:
             btn_frame,
             text="Clear",
             font=(self.font_family, 10),
-            bg="#2d3748",
-            fg="#ffffff",
-            activebackground="#4a5568",
-            activeforeground="#ffffff",
+            bg="#e2e8f0",
+            fg="#1a202c",
+            activebackground="#cbd5e0",
+            activeforeground="#1a202c",
             relief="flat",
             cursor="hand2",
             command=self.clear_fields,
@@ -229,14 +229,14 @@ class UnitConverterApp:
         )
 
         # Result Card Area
-        self.result_frame = tk.Frame(inner_frame, bg="#0f3460", padx=10, pady=10)
+        self.result_frame = tk.Frame(inner_frame, bg="#e8f0fe", padx=10, pady=10)
         self.result_frame.pack(fill="x", pady=(5, 0))
 
         self.lbl_result_title = tk.Label(
             self.result_frame,
             text="Result",
             font=(self.font_family, 8, "bold"),
-            bg="#0f3460",
+            bg="#e8f0fe",
             fg=self.muted_color,
         )
         self.lbl_result_title.pack(anchor="w")
@@ -245,7 +245,7 @@ class UnitConverterApp:
             self.result_frame,
             text="---",
             font=(self.font_family, 14, "bold"),
-            bg="#0f3460",
+            bg="#e8f0fe",
             fg=self.primary_color,
         )
         self.lbl_result_value.pack(anchor="w", pady=(2, 0))

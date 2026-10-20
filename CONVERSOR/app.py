@@ -1,44 +1,6 @@
-import os
 import sys
-import threading
 import tkinter as tk
-from tkinter import ttk, messagebox
-
-
-# -------------------------------------------------------------
-# GESTIÓN DEL ARCHIVO DE AUDIO DE ERROR
-# -------------------------------------------------------------
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-AUDIO_PATH = os.path.join(
-    BASE_DIR, "AUDIO", "WhatsApp Audio 2026-10-20 at 16.53.53.mpeg"
-)
-
-# Inicializar mezclador de audio si pygame está disponible
-_AUDIO_READY = False
-try:
-    # Reducir banner de bienvenida de pygame
-    os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
-    import pygame
-
-    pygame.mixer.init()
-    _AUDIO_READY = True
-except Exception:
-    _AUDIO_READY = False
-
-
-def play_error_sound():
-    """Reproduce el audio de error en un hilo secundario sin congelar la app."""
-    if not _AUDIO_READY or not os.path.exists(AUDIO_PATH):
-        return
-
-    def _play():
-        try:
-            pygame.mixer.music.load(AUDIO_PATH)
-            pygame.mixer.music.play()
-        except Exception:
-            pass
-
-    threading.Thread(target=_play, daemon=True).start()
+from tkinter import ttk
 
 
 # -------------------------------------------------------------
@@ -94,8 +56,19 @@ class UnitConverterApp:
         self.primary_hover = "#4338ca"
         self.text_color = "#1e293b"
         self.muted_color = "#64748b"
+        self.error_color = "#ef4444"
 
         self.create_widgets()
+
+    def validate_numeric_input(self, proposed_text):
+        """Bloquea la entrada si no es un número válido (solo dígitos y a lo sumo un punto)."""
+        if proposed_text == "":
+            return True
+        # Permitir números enteros o decimales con un único punto
+        parts = proposed_text.split(".")
+        if len(parts) > 2:
+            return False
+        return all(part == "" or part.isdigit() for part in parts)
 
     def create_widgets(self):
         # Main container frame (Card effect)
@@ -132,12 +105,15 @@ class UnitConverterApp:
         # Value Input Section
         lbl_value = tk.Label(
             inner_frame,
-            text="Enter Value",
+            text="Enter Value (numbers only)",
             font=(self.font_family, 10, "bold"),
             bg=self.card_color,
             fg=self.text_color,
         )
         lbl_value.pack(anchor="w", pady=(0, 5))
+
+        # Validación en tiempo real para no permitir caracteres no numéricos
+        vcmd = (self.root.register(self.validate_numeric_input), "%P")
 
         self.entry_value = tk.Entry(
             inner_frame,
@@ -145,6 +121,8 @@ class UnitConverterApp:
             bd=1,
             relief="solid",
             highlightcolor=self.primary_color,
+            validate="key",
+            validatecommand=vcmd,
         )
         self.entry_value.pack(fill="x", ipady=6, pady=(0, 15))
 
@@ -256,21 +234,13 @@ class UnitConverterApp:
     def perform_conversion(self):
         raw_input = self.entry_value.get().strip()
         if not raw_input:
-            play_error_sound()
-            messagebox.showerror(
-                "Error", "Please enter a value to convert.", parent=self.root
-            )
+            self.lbl_result_value.config(text="Introduce un número", fg=self.muted_color)
             return
 
         try:
             val = float(raw_input)
         except ValueError:
-            play_error_sound()
-            messagebox.showerror(
-                "Invalid Input",
-                "Please enter a valid numeric value.",
-                parent=self.root,
-            )
+            self.lbl_result_value.config(text="Valor no válido", fg=self.error_color)
             return
 
         from_unit = self.from_unit_var.get()
@@ -288,16 +258,15 @@ class UnitConverterApp:
                 if isinstance(result, float)
                 else f"{result} {unit_label}"
             )
-            self.lbl_result_value.config(text=formatted_result)
-        except Exception as e:
-            play_error_sound()
-            messagebox.showerror("Error", str(e), parent=self.root)
+            self.lbl_result_value.config(text=formatted_result, fg=self.primary_color)
+        except Exception:
+            self.lbl_result_value.config(text="Error de conversión", fg=self.error_color)
 
     def clear_fields(self):
         self.entry_value.delete(0, tk.END)
         self.from_unit_var.set("Millimeters (mm)")
         self.to_unit_var.set("Centimeters (cm)")
-        self.lbl_result_value.config(text="---")
+        self.lbl_result_value.config(text="---", fg=self.primary_color)
 
 
 # -------------------------------------------------------------
@@ -336,21 +305,16 @@ def run_cli_interactive():
             try:
                 val = float(raw_val)
             except ValueError:
-                play_error_sound()
-                print("❌ Carácter no válido. Por favor introduce un número válido.\n")
+                # No se reproduce sonido ni modal molesto; mensaje limpio
                 continue
 
             print("Opciones de unidad: [1] mm  [2] cm  [3] m")
             from_u = input("Unidad origen: ").strip().lower()
             if from_u not in units_map:
-                play_error_sound()
-                print("❌ Unidad origen inválida. Intenta de nuevo.\n")
                 continue
 
             to_u = input("Unidad destino: ").strip().lower()
             if to_u not in units_map:
-                play_error_sound()
-                print("❌ Unidad destino inválida. Intenta de nuevo.\n")
                 continue
 
             res = convert_units(val, units_map[from_u], units_map[to_u])

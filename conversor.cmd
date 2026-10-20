@@ -6,3 +6,4 @@ if "%1"=="--cli" (
 ) else (
     python "%~dp0CONVERSOR\app.py" %*
 )
+

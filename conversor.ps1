@@ -35,3 +35,4 @@ if ($Cli) {
 } else {
     python $scriptPath
 }
+

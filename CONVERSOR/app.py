@@ -1,6 +1,44 @@
+import os
 import sys
+import threading
 import tkinter as tk
 from tkinter import ttk, messagebox
+
+
+# -------------------------------------------------------------
+# GESTIÓN DEL ARCHIVO DE AUDIO DE ERROR
+# -------------------------------------------------------------
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+AUDIO_PATH = os.path.join(
+    BASE_DIR, "AUDIO", "WhatsApp Audio 2026-10-20 at 16.53.53.mpeg"
+)
+
+# Inicializar mezclador de audio si pygame está disponible
+_AUDIO_READY = False
+try:
+    # Reducir banner de bienvenida de pygame
+    os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
+    import pygame
+
+    pygame.mixer.init()
+    _AUDIO_READY = True
+except Exception:
+    _AUDIO_READY = False
+
+
+def play_error_sound():
+    """Reproduce el audio de error en un hilo secundario sin congelar la app."""
+    if not _AUDIO_READY or not os.path.exists(AUDIO_PATH):
+        return
+
+    def _play():
+        try:
+            pygame.mixer.music.load(AUDIO_PATH)
+            pygame.mixer.music.play()
+        except Exception:
+            pass
+
+    threading.Thread(target=_play, daemon=True).start()
 
 
 # -------------------------------------------------------------
@@ -18,7 +56,6 @@ UNIT_FACTORS_TO_MM = {
 
 def convert_units(value: float, from_unit: str, to_unit: str) -> float:
     """Convierte un valor numérico entre mm, cm y m basándose en mm como unidad base."""
-    # Extraer código de unidad simplificado
     def normalize_unit(unit_str: str) -> str:
         s = unit_str.lower().strip()
         if "mm" in s or "milli" in s:
@@ -219,6 +256,7 @@ class UnitConverterApp:
     def perform_conversion(self):
         raw_input = self.entry_value.get().strip()
         if not raw_input:
+            play_error_sound()
             messagebox.showerror(
                 "Error", "Please enter a value to convert.", parent=self.root
             )
@@ -227,6 +265,7 @@ class UnitConverterApp:
         try:
             val = float(raw_input)
         except ValueError:
+            play_error_sound()
             messagebox.showerror(
                 "Invalid Input",
                 "Please enter a valid numeric value.",
@@ -239,7 +278,11 @@ class UnitConverterApp:
 
         try:
             result = convert_units(val, from_unit, to_unit)
-            unit_label = "mm" if "Millimeters" in to_unit else ("cm" if "Centimeters" in to_unit else "m")
+            unit_label = (
+                "mm"
+                if "Millimeters" in to_unit
+                else ("cm" if "Centimeters" in to_unit else "m")
+            )
             formatted_result = (
                 f"{result:g} {unit_label}"
                 if isinstance(result, float)
@@ -247,6 +290,7 @@ class UnitConverterApp:
             )
             self.lbl_result_value.config(text=formatted_result)
         except Exception as e:
+            play_error_sound()
             messagebox.showerror("Error", str(e), parent=self.root)
 
     def clear_fields(self):
@@ -289,25 +333,32 @@ def run_cli_interactive():
             if not raw_val:
                 continue
 
-            val = float(raw_val)
+            try:
+                val = float(raw_val)
+            except ValueError:
+                play_error_sound()
+                print("❌ Carácter no válido. Por favor introduce un número válido.\n")
+                continue
 
             print("Opciones de unidad: [1] mm  [2] cm  [3] m")
             from_u = input("Unidad origen: ").strip().lower()
             if from_u not in units_map:
+                play_error_sound()
                 print("❌ Unidad origen inválida. Intenta de nuevo.\n")
                 continue
 
             to_u = input("Unidad destino: ").strip().lower()
             if to_u not in units_map:
+                play_error_sound()
                 print("❌ Unidad destino inválida. Intenta de nuevo.\n")
                 continue
 
             res = convert_units(val, units_map[from_u], units_map[to_u])
-            print(f"\n✔ Resultado: {val:g} {units_map[from_u]} = {res:g} {units_map[to_u]}\n")
+            print(
+                f"\n✔ Resultado: {val:g} {units_map[from_u]} = {res:g} {units_map[to_u]}\n"
+            )
             print("-" * 45)
 
-        except ValueError:
-            print("❌ Por favor introduce un número válido.\n")
         except (KeyboardInterrupt, EOFError):
             print("\nOperación cancelada. ¡Hasta luego!")
             break
@@ -317,7 +368,6 @@ def run_cli_interactive():
 # PUNTO DE ENTRADA
 # -------------------------------------------------------------
 if __name__ == "__main__":
-    # Si se pasa el argumento --cli o no hay entorno gráfico disponible, ejecutar en terminal
     if "--cli" in sys.argv:
         run_cli_interactive()
     else:
@@ -326,5 +376,4 @@ if __name__ == "__main__":
             app = UnitConverterApp(root)
             root.mainloop()
         except Exception:
-            # Fallback a terminal si falla el servidor gráfico
             run_cli_interactive()

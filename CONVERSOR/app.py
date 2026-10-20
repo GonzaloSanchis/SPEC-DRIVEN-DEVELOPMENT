@@ -45,15 +45,15 @@ class UnitConverterApp:
         self.root = root
         self.root.title("Modern Unit Converter")
         self.root.geometry("450x520")
-        self.root.config(bg="#f8fafc")
+        self.root.config(bg="#f0f7ff")
         self.root.resizable(False, False)
 
-        # Styling variables
+        # Styling variables (Modern Blue Palette)
         self.font_family = "Segoe UI"
-        self.bg_color = "#f8fafc"
+        self.bg_color = "#f0f7ff"
         self.card_color = "#ffffff"
-        self.primary_color = "#4f46e5"  # Indigo
-        self.primary_hover = "#4338ca"
+        self.primary_color = "#2563eb"  # Blue
+        self.primary_hover = "#1d4ed8"  # Darker Blue
         self.text_color = "#1e293b"
         self.muted_color = "#64748b"
         self.error_color = "#ef4444"
@@ -210,14 +210,14 @@ class UnitConverterApp:
         )
 
         # Result Card Area
-        self.result_frame = tk.Frame(inner_frame, bg="#f1f5f9", padx=10, pady=10)
+        self.result_frame = tk.Frame(inner_frame, bg="#eff6ff", padx=10, pady=10)
         self.result_frame.pack(fill="x", pady=(5, 0))
 
         self.lbl_result_title = tk.Label(
             self.result_frame,
             text="Result",
             font=(self.font_family, 8, "bold"),
-            bg="#f1f5f9",
+            bg="#eff6ff",
             fg=self.muted_color,
         )
         self.lbl_result_title.pack(anchor="w")
@@ -226,7 +226,7 @@ class UnitConverterApp:
             self.result_frame,
             text="---",
             font=(self.font_family, 14, "bold"),
-            bg="#f1f5f9",
+            bg="#eff6ff",
             fg=self.primary_color,
         )
         self.lbl_result_value.pack(anchor="w", pady=(2, 0))

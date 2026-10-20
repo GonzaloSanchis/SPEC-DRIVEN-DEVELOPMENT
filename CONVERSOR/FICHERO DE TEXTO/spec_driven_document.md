@@ -60,15 +60,15 @@ class UnitConverterApp:
     self.root = root
     self.root.title("Modern Unit Converter")
     self.root.geometry("450x520")
-    self.root.config(bg="#f8fafc")
+    self.root.config(bg="#f0f7ff")
     self.root.resizable(False, False)
 
     # Styling variables
     self.font_family = "Segoe UI"
-    self.bg_color = "#f8fafc"
+    self.bg_color = "#f0f7ff"
     self.card_color = "#ffffff"
-    self.primary_color = "#4f46e5"  # Indigo
-    self.primary_hover = "#4338ca"
+    self.primary_color = "#2563eb"  # Blue
+    self.primary_hover = "#1d4ed8"
     self.text_color = "#1e293b"
     self.muted_color = "#64748b"
 

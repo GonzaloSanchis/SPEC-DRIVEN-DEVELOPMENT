@@ -1,0 +1,23 @@
+name: Solicitud de Mejora / Feature
+description: Proponer una nueva funcionalidad, idea o mejora
+title: "[FEAT]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Propón una nueva funcionalidad o mejora para la aplicación.
+  - type: textarea
+    id: description
+    attributes:
+      label: Descripción de la propuesta
+      description: Explica detalladamente qué te gustaría añadir o cambiar.
+    validations:
+      required: true
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Motivación o caso de uso
+      description: ¿Por qué es útil esta nueva característica?
+    validations:
+      required: false

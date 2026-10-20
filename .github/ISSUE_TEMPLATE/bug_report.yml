@@ -1,0 +1,41 @@
+name: Bug Report
+description: Crear un reporte de error / fallo en el programa
+title: "[BUG]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Gracias por tomarte el tiempo de reportar este problema.
+  - type: input
+    id: summary
+    attributes:
+      label: Resumen breve
+      description: Explica brevemente qué fallo has encontrado.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Pasos para reproducir
+      description: Pasos exactos para recrear el problema.
+      placeholder: |
+        1. Ejecuto `.\conversor.ps1`
+        2. Escribo '...' en el campo
+        3. Ocurre ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Comportamiento esperado
+      description: Qué esperabas que ocurriera.
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Comportamiento actual
+      description: Qué ocurre en realidad (incluyendo mensajes de error o consola).
+    validations:
+      required: true
